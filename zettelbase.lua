@@ -12,6 +12,7 @@ local Handler = require 'pegasus.handler'
 local copas = require('copas')
 local Compress = require 'pegasus.compress'
 local authenticate = require "basic-auth"
+local controller = require "zettelbase.controller"
 
 local hdlr = Handler:new(function (req, rep)
     if rep then
@@ -28,6 +29,13 @@ local hdlr = Handler:new(function (req, rep)
       rep:addHeader('Content-Type', 'text/html')
       if auth then
         print(auth.name, auth.pass)
+      end
+      controller.get("/hello/:name", function(params)
+         return "controller hello: ".. params.name
+      end)
+      local status, msg =  controller.run(req, rep)
+      if status then
+        t[#t+1] = msg
       end
       rep:write(table.concat(t,"\n"))
     end
