@@ -67,9 +67,9 @@ local tokenize = function(str)
   return tokens
 end
 
-local tokens = tokenize "nazdar 'světe', příliš? (žluťoučký) @kůň"
-for k,v in ipairs(tokens) do
-  print(k,v)
-end
+-- local tokens = tokenize "nazdar 'světe', příliš? (žluťoučký) @kůň"
+-- for k,v in ipairs(tokens) do
+--   print(k,v)
+-- end
 M.tokenize = tokenize
 return M
