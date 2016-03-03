@@ -67,6 +67,7 @@ function M.find_word(db, word)
   local function get_words(suffixes, words, chars)
     local words = words or {}
     local chars = chars or ""
+    local suffixes = suffixes or {}
     if suffixes["$"] then
       table.insert(words, chars)
     end
@@ -76,23 +77,14 @@ function M.find_word(db, word)
     return words
   end
   local suffixes = get_suffixes(chars)
-  if suffixes then
-    local words = get_words(suffixes)
-    for k, v in pairs(words) do
-      print(word,v)
-    end
+  local words = get_words(suffixes)
+  for k, v in pairs(words) do
+    print(word,v)
   end
+  return words
 end
 
 
-local db = {}
-for k,v in ipairs {
-  "žluna", "rys", "vajíčko", "les", "lesák", "šumava", "lesník", "lesový", "lesa"
-} do
-  M.add_word(db, v)
-end
-
-M.find_word(db, "les")
-M.find_word(db, "rys")
-M.find_word(db, "rysaddjj")
 -- print_db(db)
+--
+return M
