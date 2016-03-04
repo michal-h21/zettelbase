@@ -5,6 +5,7 @@ local tokenize = tokenizer.tokenize
 local tokenstr = tokenizer.tokenstr
 local lowerstr = tokenizer.lowerstr
 local unaccstr = tokenizer.unaccentedstr
+local get_variants = tokenizer.get_variants
 
 local tokens = {}
 local count = 0
@@ -14,20 +15,25 @@ local function add_token(str)
   tokens[str] = i
 end
 local ulower = unicode.utf8.lower
+
+-- local indexdb
 for line in io.lines() do
   for _, token in ipairs(tokenize(line)) do
-    local str = tokenstr(token)
-    local lstr, is_upper = lowerstr(token)
-    add_token(str)
-    if is_upper then
-      add_token(lstr)
-    end
-    local unaccstr, is_acc = unaccstr(token)
-    if is_acc then
-      add_token(unaccstr)
-      if is_upper then
-        add_token(ulower(unaccstr))
-      end
+    -- local str = tokenstr(token)
+    -- local lstr, is_upper = lowerstr(token)
+    -- add_token(str)
+    -- if is_upper then
+    --   add_token(lstr)
+    -- end
+    -- local unaccstr, is_acc = unaccstr(token)
+    -- if is_acc then
+    --   add_token(unaccstr)
+    --   if is_upper then
+    --     add_token(ulower(unaccstr))
+    --   end
+    -- end
+    for _,t in ipairs(get_variants(token)) do
+      add_token(t)
     end
     count = count + 1
   end
@@ -50,3 +56,6 @@ index.find_word(db, "les")
 index.find_word(db, "rys")
 index.find_word(db, "rysaddjj")
 index.find_word(db, "table")
+index.find_word(db, "pi")
+
+print(collectgarbage("count")*1024)
