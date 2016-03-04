@@ -1,12 +1,16 @@
 local M = {}
 
-local unicode = unicode or require "unicode"
+unicode = unicode or require "unicode"
+local removeaccents = require "zettelbase.removeaccents"
 
 local sub = unicode.utf8.sub
 local ubyte = unicode.utf8.byte
 
+-- all codepoints between starting number and next one fall into current category
 local categories = {
-  {0,  "controll"},
+  {0,  "system"},
+  {32, "space"},
+  {33, "controll"},
   {48, "numbers"},
   {58, "controll"},
   {65, "letters"},
@@ -14,13 +18,18 @@ local categories = {
   {97, "letters"},
   {123, "controll"},
   {0x00C0, "letters"},
+  {0x2000, "controll"},
+  {0x2070, "letters"}
 }
 local memoized_categories = {}
 local function get_category(char)
   if memoized_categories[char] then return memoized_categories[char] end
   local category = ""
   local charcode = ubyte(char)
+  -- search categories table for the letter
   for _, c in ipairs(categories) do
+    -- c[1] is the start of current codepoint range
+    -- if the current codepoint is lower, it falls into previous range
     if charcode < c[1] then break end
     category = c[2]
   end
@@ -29,7 +38,26 @@ local function get_category(char)
   return category
 end
 
+local inwords = {["."] = "", ["'"] = "'"}
 
+-- we need to fix things like "don't", "F.B.I." etc 
+local function prepare_token_stream(stream)
+  for i, v in ipairs(stream) do
+    local current = stream[i]
+    if current.category == "controll" then
+      local prev = stream[i - 1] or {}
+      local next = stream[i + 1] or {}
+      if prev.category == "letters" and next.category == "letters" and inwords[current.char]  then
+        current.category = "letters"
+        current.char = inwords[current.char]
+      end
+    end
+  end
+  return stream
+end
+
+
+-- process the token stream -- words are consecutive letter objects
 local function token_stream(stream, tokens, pos)
   local tokens = tokens or {}
   local pos = pos or 1
@@ -63,6 +91,7 @@ local tokenize = function(str)
     pos = pos + 1
     char = sub(str, pos, pos )
   end
+  stream = prepare_token_stream(stream)
   tokens = token_stream(stream)
   return tokens
 end
