@@ -5,6 +5,7 @@ local removeaccents = require "zettelbase.removeaccents"
 
 local sub = unicode.utf8.sub
 local ubyte = unicode.utf8.byte
+local ulower = unicode.utf8.lower
 
 -- all codepoints between starting number and next one fall into current category
 local categories = {
@@ -70,14 +71,31 @@ local function token_stream(stream, tokens, pos)
     currobj = stream[pos] or {}
   end
   if #curr > 0 then
-    tokens[#tokens + 1] = table.concat(curr) 
+    tokens[#tokens + 1] = curr--table.concat(curr) 
   else
     pos = pos + 1
   end
   return token_stream(stream, tokens, pos )
 end
 
-  
+-- token to string functions
+-- return converted string, contains uppercase?: boolean
+function M.lowerstr(tokens)  
+  local str = table.concat(tokens)
+  local low = ulower(str)
+  return str, str == low
+end
+
+-- convert tokens to plain strin
+function M.tokenstr(tokens)
+  return table.concat(tokens)
+end
+
+function M.unaccentedstr(tokens)
+  local tokens, status = removeaccents.strip_accents(tokens)
+  return table.concat(tokens), status
+end
+
 
 local tokenize = function(str)
   local tokens = {}
@@ -92,6 +110,7 @@ local tokenize = function(str)
     char = sub(str, pos, pos )
   end
   stream = prepare_token_stream(stream)
+  -- tokens is table with character subarrays
   tokens = token_stream(stream)
   return tokens
 end
