@@ -69,7 +69,7 @@ function M.find_word(db, word)
     local chars = chars or ""
     local suffixes = suffixes or {}
     if suffixes["$"] then
-      table.insert(words, chars)
+      table.insert(words, word .. chars)
     end
     for ch, subtable in pairs(suffixes) do
       words = get_words(subtable, words, chars .. ch)
