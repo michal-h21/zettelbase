@@ -1,7 +1,7 @@
 -- 
 --
 --
-local unicode = unicode or require "unicode"
+unicode = unicode or require "unicode"
 local M = {}
 local index = {
   documents = {},
