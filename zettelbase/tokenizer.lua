@@ -96,6 +96,30 @@ function M.unaccentedstr(tokens)
   return table.concat(tokens), status
 end
 
+-- get table with various string variants of tokens
+function M.get_variants(tokens)
+  local t = {}
+  local str = M.tokenstr(tokens)
+  t[#t+1] = str
+  local lowerstr  = ulower(str)
+  local lowstatus = str ~= lowerstr
+  if lowstatus then
+    -- save lower cased string
+    t[#t+1] = lowerstr
+  end
+  local unaccented, unstatus = M.unaccentedstr(tokens)
+  if unstatus then
+    -- save string with removed accents
+    t[#t+1] = unaccented
+    if lowstatus then
+      -- save lowercased unaccented string
+      t[#t+1] = ulower(unaccented)
+    end
+  end
+  return t
+end
+
+
 
 local tokenize = function(str)
   local tokens = {}
