@@ -60,7 +60,7 @@ end
 local db = {}
 for str, c in pairs(tokens) do
   index.add_word(db, str)
-  print(str)
+  -- print(str)
 end
   
 
@@ -74,7 +74,8 @@ index.find_word(db, "les")
 index.find_word(db, "rys")
 index.find_word(db, "rysaddjj")
 index.find_word(db, "table")
-local pitt = index.find_word(db, "pi")
+local search = arg[1] or "pit"
+local pitt = index.find_word(db,search)
 
 
 for _, word in ipairs(pitt) do
