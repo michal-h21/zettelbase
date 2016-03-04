@@ -83,7 +83,7 @@ end
 function M.lowerstr(tokens)  
   local str = table.concat(tokens)
   local low = ulower(str)
-  return str, str == low
+  return str, str ~= low
 end
 
 -- convert tokens to plain strin
