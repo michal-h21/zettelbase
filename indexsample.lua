@@ -14,10 +14,23 @@ local function add_token(str)
   i = i + 1
   tokens[str] = i
 end
+
+local indexdb = {}
+local function adddoc(docid, token, data)
+  local docs = indexdb[token] or {}
+  docs[docid] = data
+  indexdb[token] = docs
+end
+
 local ulower = unicode.utf8.lower
 
--- local indexdb
+
+local docid = 0
 for line in io.lines() do
+  docid = docid + 1
+  local doctokens = {}
+  local count = 0 
+  i = 0
   for _, token in ipairs(tokenize(line)) do
     -- local str = tokenstr(token)
     -- local lstr, is_upper = lowerstr(token)
@@ -34,15 +47,20 @@ for line in io.lines() do
     -- end
     for _,t in ipairs(get_variants(token)) do
       add_token(t)
+      doctokens[t] = true
     end
     count = count + 1
   end
+  for k,_ in pairs(doctokens) do
+    adddoc(docid, k, tokens[k] / count)
+  end
+  
 end
 
 local db = {}
 for str, c in pairs(tokens) do
   index.add_word(db, str)
-  print(str,  c / count)
+  print(str)
 end
   
 
@@ -56,6 +74,17 @@ index.find_word(db, "les")
 index.find_word(db, "rys")
 index.find_word(db, "rysaddjj")
 index.find_word(db, "table")
-index.find_word(db, "pi")
+local pitt = index.find_word(db, "pi")
+
+
+for _, word in ipairs(pitt) do
+  local t = {}
+  for k, v in pairs(indexdb[word] or {}) do
+    t[#t+1] = k
+  end
+  print(word, table.concat(t, ","))
+end
+
+-- for word, documents in pairs(indexdb) 
 
 print(collectgarbage("count")*1024)
